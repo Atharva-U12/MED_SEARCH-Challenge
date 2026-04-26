@@ -1,0 +1,26 @@
+name: Auto-Grader
+on: [push]
+
+permissions:
+  contents: write
+
+jobs:
+  grade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - name: Install Dependencies
+        run: pip install pandas tabulate
+      - name: Run Judge
+        run: python evaluator.py
+      - name: Update Leaderboard
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Leaderboard-Bot"
+          git add leaderboard.md
+          git commit -m "update: leaderboard" || echo "No changes"
+          git push

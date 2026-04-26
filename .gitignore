@@ -1,0 +1,31 @@
+# --- macOS System Files ---
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# --- Windows System Files ---
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# --- Python / Environment ---
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env
+.venv/
+.pytest_cache/
+
+# --- Data & Large Files ---
+# We keep data/Medsearch.csv because it's required for the competition,
+# but we ignore any temporary Excel or CSV backups.
+data/*.xlsx
+data/*.zip
+data/*.tmp
+
+# --- IDEs ---
+.vscode/
+.idea/
+*.swp
