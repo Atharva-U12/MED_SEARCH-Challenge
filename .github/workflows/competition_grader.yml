@@ -11,7 +11,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # Fetches all history so push works smoothly
+          fetch-depth: 0 
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -23,20 +23,23 @@ jobs:
 
       - name: Run Judge
         run: |
-          # We use python3 to ensure it points to the correct environment
           python3 src/evaluator.py 
 
       - name: Update Leaderboard
         run: |
+          # 1. Identity setup
           git config --global user.email "action@github.com"
           git config --global user.name "Leaderboard-Bot"
           
-          # Pull latest changes in case someone else pushed while this was running
-          git pull origin main --rebase
-          
+          # 2. Stage the new leaderboard FIRST to avoid the "unstaged changes" error
           git add leaderboard.md
           
-          # The [skip ci] tag is CRITICAL to prevent infinite loops
+          # 3. Stash any other minor environment changes and pull latest from GitHub
+          git pull origin main --rebase
+          
+          # 4. Finalize the commit
+          # Using [skip ci] prevents the action from triggering itself again
           git commit -m "update: leaderboard [skip ci]" || echo "No changes to commit"
           
+          # 5. Push back to the repository
           git push origin main
