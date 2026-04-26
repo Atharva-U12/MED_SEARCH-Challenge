@@ -42,4 +42,5 @@ def get_recommendations(df: pd.DataFrame, brand_name: str, top_n: int = 10) -> O
         (alternatives["savings_inr"] / target_price) * 100
     ).round(2)
 
-    return alternatives.head(top_n)
+    return alternatives.head(10)
+print("These are4 10 affordable alternatives for your medicine")
