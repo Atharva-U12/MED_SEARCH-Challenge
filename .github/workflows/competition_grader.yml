@@ -31,15 +31,21 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global user.name "Leaderboard-Bot"
           
-          # 2. Stage the new leaderboard FIRST to avoid the "unstaged changes" error
+          # 2. Hide the new leaderboard changes temporarily (Stash)
+          # This cleans the workspace so Git doesn't complain during the pull
           git add leaderboard.md
+          git stash
           
-          # 3. Stash any other minor environment changes and pull latest from GitHub
+          # 3. Sync with the remote repository
           git pull origin main --rebase
           
-          # 4. Finalize the commit
-          # Using [skip ci] prevents the action from triggering itself again
+          # 4. Bring the new leaderboard changes back (Pop)
+          git stash pop || echo "No changes to apply"
+          
+          # 5. Finalize the commit
+          # [skip ci] prevents an infinite loop of actions
+          git add leaderboard.md
           git commit -m "update: leaderboard [skip ci]" || echo "No changes to commit"
           
-          # 5. Push back to the repository
+          # 6. Push to GitHub
           git push origin main
