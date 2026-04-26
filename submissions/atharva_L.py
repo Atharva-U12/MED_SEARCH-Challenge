@@ -44,4 +44,4 @@ def get_recommendations(df: pd.DataFrame, brand_name: str, top_n: int = 10) -> O
 
     return alternatives.head(10)
 #This will display top 10 columns of the table
-print("This are the top 10 drugs fro you")
+print("This are the top 10 drugs for you")
