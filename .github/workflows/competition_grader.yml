@@ -1,5 +1,5 @@
 name: Auto-Grader
-on: [push]
+on: [push, pull_request]
 
 permissions:
   contents: write
@@ -8,19 +8,42 @@ jobs:
   grade:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
+
       - name: Install Dependencies
         run: pip install pandas tabulate
+
       - name: Run Judge
-        run: python evaluator.py
+        run: |
+          python3 src/evaluator.py 
+
       - name: Update Leaderboard
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "Leaderboard-Bot"
+          git config --global user.email "action@github.com"
+          git config --global user.name "Leaderboard-Bot"
+          
+          # 1. Capture the new leaderboard changes
           git add leaderboard.md
-          git commit -m "update: leaderboard" || echo "No changes"
-          git push
+          git stash
+          
+          # 2. Force the runner to recognize the 'main' branch
+          git checkout main || git checkout -b main
+          
+          # 3. Pull latest changes (including the PR you just merged)
+          git pull origin main --rebase
+          
+          # 4. Apply the leaderboard update
+          git stash pop || echo "No changes to apply"
+          
+          # 5. Commit and Push explicitly to main
+          git add leaderboard.md
+          git commit -m "update: leaderboard [skip ci]" || echo "No changes to commit"
+          git push origin HEAD:main
