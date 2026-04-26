@@ -1,0 +1,48 @@
+import numpy as np
+import pandas as pd
+from typing import Optional
+
+def get_recommendations(df: pd.DataFrame, brand_name: str, top_n: int = 10) -> Optional[pd.DataFrame]:
+    """
+    Finds cheaper alternative drugs based on identical composition, strength, and dosage.
+    Note: The 'df' is passed automatically by the competition evaluator.
+    """
+    
+    # 1. Clean the input brand name
+    brand_name = str(brand_name).strip()
+
+    # 2. Safety check: Does the brand exist?
+    if brand_name not in df["brand_name"].values:
+        return None
+
+    # 3. Get the target drug's attributes
+    input_drug = df[df["brand_name"] == brand_name].iloc[0]
+    
+    target_ingredient = input_drug["primary_ingredient"]
+    target_strength = input_drug["primary_strength"]
+    target_dosage = input_drug["dosage_form"]
+    target_price = input_drug["price_inr"]
+
+    # 4. Find matches (Same content, different brand)
+    alternatives = df[
+        (df["primary_ingredient"] == target_ingredient) &
+        (df["primary_strength"] == target_strength) &
+        (df["dosage_form"] == target_dosage) &
+        (df["brand_name"] != brand_name)
+    ].copy()
+
+    # 5. Return None if no matches found
+    if alternatives.empty:
+        return None
+
+    # 6. Competition Logic: Sort by cheapest and calculate savings
+    alternatives = alternatives.sort_values(by="price_inr", ascending=True)
+    
+    alternatives["savings_inr"] = (target_price - alternatives["price_inr"]).round(2)
+    alternatives["savings_percent"] = (
+        (alternatives["savings_inr"] / target_price) * 100
+    ).round(2)
+
+    return alternatives.head(10)
+#This will display top 10 columns of the table
+print("This are the top 10 drugs fro you")
