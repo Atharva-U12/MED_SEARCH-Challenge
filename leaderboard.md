@@ -2,4 +2,4 @@
 
 | Participant   |   Score |   Execution Time (s) |
 |:--------------|--------:|---------------------:|
-| tester        |       0 |             0.038739 |
+| tester        |       0 |             0.040343 |
