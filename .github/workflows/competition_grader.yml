@@ -1,5 +1,5 @@
 name: Auto-Grader
-on: [push]
+on: [push, pull_request]
 
 permissions:
   contents: write
@@ -8,19 +8,35 @@ jobs:
   grade:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Fetches all history so push works smoothly
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
+
       - name: Install Dependencies
         run: pip install pandas tabulate
+
       - name: Run Judge
-        run: python evaluator.py
+        run: |
+          # We use python3 to ensure it points to the correct environment
+          python3 src/evaluator.py 
+
       - name: Update Leaderboard
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "Leaderboard-Bot"
+          git config --global user.email "action@github.com"
+          git config --global user.name "Leaderboard-Bot"
+          
+          # Pull latest changes in case someone else pushed while this was running
+          git pull origin main --rebase
+          
           git add leaderboard.md
-          git commit -m "update: leaderboard" || echo "No changes"
-          git push
+          
+          # The [skip ci] tag is CRITICAL to prevent infinite loops
+          git commit -m "update: leaderboard [skip ci]" || echo "No changes to commit"
+          
+          git push origin main
