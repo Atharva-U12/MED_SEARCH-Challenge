@@ -23,3 +23,8 @@ Given a pharmaceutical dataset, participants must create a recommendation engine
 ├── .github/workflows/  # CI/CD (GitHub Actions)
 ├── requirements.txt    # Project dependencies
 └── leaderboard.md      # Auto-generated rankings
+
+## Team Member :-
+Atharva Uttekar - 1132231120
+Atharva Lokhande - 1132231225
+Shruti Mane - 1132231335
