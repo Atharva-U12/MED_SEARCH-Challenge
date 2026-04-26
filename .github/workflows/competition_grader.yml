@@ -27,25 +27,23 @@ jobs:
 
       - name: Update Leaderboard
         run: |
-          # 1. Identity setup
           git config --global user.email "action@github.com"
           git config --global user.name "Leaderboard-Bot"
           
-          # 2. Hide the new leaderboard changes temporarily (Stash)
-          # This cleans the workspace so Git doesn't complain during the pull
+          # 1. Capture the new leaderboard changes
           git add leaderboard.md
           git stash
           
-          # 3. Sync with the remote repository
+          # 2. Force the runner to recognize the 'main' branch
+          git checkout main || git checkout -b main
+          
+          # 3. Pull latest changes (including the PR you just merged)
           git pull origin main --rebase
           
-          # 4. Bring the new leaderboard changes back (Pop)
+          # 4. Apply the leaderboard update
           git stash pop || echo "No changes to apply"
           
-          # 5. Finalize the commit
-          # [skip ci] prevents an infinite loop of actions
+          # 5. Commit and Push explicitly to main
           git add leaderboard.md
           git commit -m "update: leaderboard [skip ci]" || echo "No changes to commit"
-          
-          # 6. Push to GitHub
-          git push origin main
+          git push origin HEAD:main
